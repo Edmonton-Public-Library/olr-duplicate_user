@@ -26,8 +26,29 @@
 ###########################################################################
 import sys
 import getopt
-import json
 import urllib3
+
+# curl -i -XGET 'http://localhost:9200/_cluster/health?pretty'
+# HTTP/1.1 200 OK
+# content-type: application/json; charset=UTF-8
+# content-length: 467
+# {
+  # "cluster_name" : "duplicate_user",
+  # "status" : "yellow",
+  # "timed_out" : false,
+  # "number_of_nodes" : 1,
+  # "number_of_data_nodes" : 1,
+  # "active_primary_shards" : 5,
+  # "active_shards" : 5,
+  # "relocating_shards" : 0,
+  # "initializing_shards" : 0,
+  # "unassigned_shards" : 5,
+  # "delayed_unassigned_shards" : 0,
+  # "number_of_pending_tasks" : 0,
+  # "number_of_in_flight_fetch" : 0,
+  # "task_max_waiting_in_queue_millis" : 0,
+  # "active_shards_percent_as_number" : 50.0
+# }
 
 class CustomerFileWriter:
     def __init__(self, output_file_name='users.json'):
@@ -66,8 +87,10 @@ class BulkLoader:
             data = data + line
             print(line)
         http = urllib3.PoolManager()
+        # In examples the 'data' is JSON-ified with json.dumps() but our data is already JSON.
         r = http.request('POST', url, body=data, headers={'Content-Type': 'application/json'})
-        # json.loads(r.data.decode('utf-8'))['json']
+        # Failed search: curl -i -XGET 'http://localhost:9200/epl/duplicate_user_test/_search?pretty' -d '{"query":{"match":{"lname":"Bill"}}}'
+        # Success search: curl -i -XGET 'http://localhost:9200/epl/duplicate_user_test/_search?pretty' -d '{"query":{"match":{"lname":"Sexsmith"}}}'
 
 # Displays usage message for the script.
 def usage():
