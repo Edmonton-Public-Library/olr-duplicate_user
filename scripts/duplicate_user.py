@@ -60,7 +60,14 @@ class BulkLoader:
             # UKEY|FNAME|LNAME|EMAIL|DOB|
             customerFileWriter.output(line)  
     def load(self, url, data_file='users.json'):
-        pass
+        f = open(data_file, 'r')
+        data = ''
+        for line in f:
+            data = data + line
+            print(line)
+        http = urllib3.PoolManager()
+        r = http.request('POST', url, body=data, headers={'Content-Type': 'application/json'})
+        # json.loads(r.data.decode('utf-8'))['json']
 
 # Displays usage message for the script.
 def usage():
@@ -74,7 +81,7 @@ def usage():
 def main(argv):
     customer_loader = ''
     customer_file = ''
-    bulk_url = 'localhost:9200/epl/duplicate_user_test/_bulk?pretty&pretty'
+    bulk_url = 'http://localhost:9200/epl/duplicate_user_test/_bulk?pretty&pretty'
     try:
         opts, args = getopt.getopt(argv, "b:Ux", ['--bulk='])
     except getopt.GetoptError:
