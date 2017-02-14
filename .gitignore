@@ -1,2 +1,4 @@
 elasticsearch-5.2.0/
 elasticsearch-5.2.0.tar.gz
+incoming/
+elasticsearch.pid
