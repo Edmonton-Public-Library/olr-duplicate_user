@@ -34,7 +34,7 @@ import urllib3
 # content-length: 467
 # {
   # "cluster_name" : "duplicate_user",
-  # "status" : "yellow",
+  # "status" : "yellow",     # Fix this by running another node.
   # "timed_out" : false,
   # "number_of_nodes" : 1,
   # "number_of_data_nodes" : 1,
@@ -91,7 +91,12 @@ class BulkLoader:
         r = http.request('POST', url, body=data, headers={'Content-Type': 'application/json'})
         # Failed search: curl -i -XGET 'http://localhost:9200/epl/duplicate_user_test/_search?pretty' -d '{"query":{"match":{"lname":"Bill"}}}'
         # Success search: curl -i -XGET 'http://localhost:9200/epl/duplicate_user_test/_search?pretty' -d '{"query":{"match":{"lname":"Sexsmith"}}}'
-
+        ####
+        # Exact match success: curl -i -XGET 'http://localhost:9200/epl/duplicate_user_test/_search?q=%2Bfname%3ASusan+%2Blname%3ASexsmith'
+        # Exact match fail: curl -i -XGET 'http://localhost:9200/epl/duplicate_user_test/_search?q=%2Bfname%3ASusan+%2Blname%3ASixsmith'
+        ### The '+' means that the condition must be satisfied for the query to succeed. 
+        # Page 77 Definitive Guide
+        # {"took":3,"timed_out":false,"_shards":{"total":5,"successful":5,"failed":0},"hits":{"total":0,"max_score":null,"hits":[]}}
 # Displays usage message for the script.
 def usage():
     '''Prints usage message to STDOUT.'''

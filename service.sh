@@ -93,6 +93,7 @@ case "$1" in
 			exit 1
 		else
 			printf "OK.\n" >&2
+			curl -XGET 'http://localhost:9200/_cluster/health?pretty'
 		fi
 		;;
     *)
