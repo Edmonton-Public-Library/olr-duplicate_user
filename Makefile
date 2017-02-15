@@ -24,7 +24,8 @@
 #
 ######################################################################################
 SERVICE=./service.sh
-.PHONY: check start stop restart ${SERVICE}
+APP=scripts/duplicate_user.py
+.PHONY: load delete check start stop restart ${SERVICE}
 
 check: ${SERVICE}
 	${SERVICE} check
@@ -38,3 +39,8 @@ stop: ${SERVICE}
 restart: ${SERVICE}
 	${SERVICE} restart
 	
+load:
+	python ${APP} -bincoming/users.lst
+	
+delete:
+	python ${APP} -ddelete/users.lst

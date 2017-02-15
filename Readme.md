@@ -12,6 +12,8 @@ Directory Structure
 - .gitignore - list of items that should not go into the repo.
 - .git - directory of git repo.
 - elasticsearch-5.2.0.tar.gz - install tarball of elasticsearch.
++ delete/ - delete directory. By default duplicate_user.py looks for a users.lst here. the file should contain all the keys you wish to delete from the database, one-per-line (no trailing pipes '|'). Once created you can run ```make delete``` to delete these customers.
++ incoming/ - directory where all the customer data is to be loaded. The file is in the form of 'UKEY|FNAME|LNAME|EMAIL|DOB|' and can be readily made from Symphony API. Once SCP'ed over to this directory type ```make load``` in the project home directory and the script will load the customer data.
 
 
 JSON-ifying
@@ -66,5 +68,45 @@ curl -XPOST 'localhost:9200/epl/duplicate_user_test/_bulk?pretty&pretty' -H 'Con
       }
     }
   ]
+}
+```
+
+Deleting objects from the database
+----------------------------------
+```
+curl -XGET 'http://localhost:9200/epl/duplicate_user_test/1382905?pretty'
+{
+  "_index" : "epl",
+  "_type" : "duplicate_user_test",
+  "_id" : "1382905",
+  "_version" : 1,
+  "found" : true,
+  "_source" : {
+    "fname" : "Balzac",
+    "lname" : "Billy",
+    "email" : "ilsadmins@hotmail.com",
+    "dob" : "19751015"
+  }
+}
+curl -XDELETE 'http://localhost:9200/epl/duplicate_user_test/1382905?pretty'
+{
+  "found" : true,
+  "_index" : "epl",
+  "_type" : "duplicate_user_test",
+  "_id" : "1382905",
+  "_version" : 2,
+  "result" : "deleted",
+  "_shards" : {
+    "total" : 2,
+    "successful" : 1,
+    "failed" : 0
+  }
+}
+curl -XGET 'http://localhost:9200/epl/duplicate_user_test/1382905?pretty'
+{
+  "_index" : "epl",
+  "_type" : "duplicate_user_test",
+  "_id" : "1382905",
+  "found" : false
 }
 ```

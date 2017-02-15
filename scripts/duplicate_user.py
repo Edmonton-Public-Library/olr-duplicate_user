@@ -67,28 +67,31 @@ class CustomerFileWriter:
         self.output_file.write("\"email\": \"%s\", " % (my_data[3]))
         self.output_file.write("\"dob\": \"%s\" }\n" % (my_data[4]))
 
-class BulkLoader:
-    def __init__(self, input_file, output_file='users.json'):
+# Adds users in bulk to the duplicate database.
+class BulkAdd:
+    def __init__(self, input_file, database, output_file='users.json'):
         assert isinstance(input_file, str)
+        self.output_file = output_file
+        self.url = 'http://localhost:9200/epl/{0}/_bulk?pretty&pretty'.format(database)
         try:
             self.file = open(input_file, 'r')
         except:
             sys.stderr.write('** error, while attempting to open "{0}"!\n'.format(input_file))
             sys.exit(1)
-        customerFileWriter = CustomerFileWriter(output_file)
+        customerFileWriter = CustomerFileWriter(self.output_file)
         for line in self.file:
             # Each line is a customer. 
             # UKEY|FNAME|LNAME|EMAIL|DOB|
             customerFileWriter.output(line)  
-    def load(self, url, data_file='users.json'):
-        f = open(data_file, 'r')
+    def run(self):
+        f = open(self.output_file, 'r')
         data = ''
         for line in f:
             data = data + line
             print(line)
         http = urllib3.PoolManager()
         # In examples the 'data' is JSON-ified with json.dumps() but our data is already JSON.
-        r = http.request('POST', url, body=data, headers={'Content-Type': 'application/json'})
+        r = http.request('POST', self.url, body=data, headers={'Content-Type': 'application/json'})
         # Failed search: curl -i -XGET 'http://localhost:9200/epl/duplicate_user_test/_search?pretty' -d '{"query":{"match":{"lname":"Bill"}}}'
         # Success search: curl -i -XGET 'http://localhost:9200/epl/duplicate_user_test/_search?pretty' -d '{"query":{"match":{"lname":"Sexsmith"}}}'
         ####
@@ -97,32 +100,62 @@ class BulkLoader:
         ### The '+' means that the condition must be satisfied for the query to succeed. 
         # Page 77 Definitive Guide
         # {"took":3,"timed_out":false,"_shards":{"total":5,"successful":5,"failed":0},"hits":{"total":0,"max_score":null,"hits":[]}}
+# Deletes many users from the database based on their user key.
+# This class expects the user key to be a single integer value, one-per-line, with no 
+# trailing pipe '|' characters.
+class BulkDelete:
+    def __init__(self, input_file, database, output_file='users.json'):
+        assert isinstance(input_file, str)
+        self.output_file = output_file
+        self.url = 'http://localhost:9200/epl/{0}'.format(database)
+        self.user_keys_file = input_file
+        
+    def run(self):
+        http = urllib3.PoolManager()
+        try:
+            f = open(self.user_keys_file, 'r')
+        except:
+            sys.stderr.write('** error, while attempting to open "{0}"!\n'.format(self.user_keys_file))
+            sys.exit(1)
+        for user_key in f:
+            # Each line is a customer. 
+            # UKEY|
+            data = self.url + '/{0}?pretty'.format(user_key.strip())
+            print(data)
+            r = http.request('DELETE', data, headers={'Content-Type': 'text/plain'})
+            print(str(r.data))
+        
+        
 # Displays usage message for the script.
 def usage():
     '''Prints usage message to STDOUT.'''
     print('Usage: {0} [-lsx]'.format('duplicate_user.py'))
-    print(' -b Bulk load JSON user data from EPLAPP.')
+    print(' -b (--bulk_add=) Bulk load JSON user data from EPLAPP in the following format: UKEY|FNAME|LNAME|EMAIL|DOB|')
+    print(' -d (--bulk_delete=) Bulk delete users from the database. User keys stored in a file; one-per-line.')
     print(' -x This message.')
     sys.exit(1)
 
-# Take valid command line arguments -b, -U, and -x.
+# Take valid command line arguments -b, -d, and -x.
 def main(argv):
     customer_loader = ''
     customer_file = ''
-    bulk_url = 'http://localhost:9200/epl/duplicate_user_test/_bulk?pretty&pretty'
+    database = 'duplicate_user_test'
     try:
-        opts, args = getopt.getopt(argv, "b:Ux", ['--bulk='])
+        opts, args = getopt.getopt(argv, "b:d:Ux", ['--bulk_add=', '--bulk_delete='])
     except getopt.GetoptError:
         usage()
     for opt, arg in opts:
-        if opt in ( "-b", "--bulk_file" ):
+        if opt in ( "-b", "--bulk_add" ):
             customer_file = arg
-        elif opt in "-U":
-            pass
+            customer_loader = BulkAdd(customer_file, database, 'users_add.json')
+            customer_loader.run()
+        elif opt in ( "-d", "--bulk_delete" ):
+            customer_file = arg
+            customer_deleter = BulkDelete(customer_file, database, 'users_delete.txt')
+            customer_deleter.run()
         elif opt in "-x":
             usage()
-    customer_loader = BulkLoader(customer_file, 'users.json')
-    customer_loader.load(bulk_url, 'users.json')
+    
     # Done.
     sys.exit(0)
 
