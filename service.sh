@@ -94,6 +94,7 @@ case "$1" in
 		else
 			printf "OK.\n" >&2
 			curl -XGET 'http://localhost:9200/_cluster/health?pretty'
+			curl -i -XGET 'http://localhost:9200/epl/duplicate_user/_count?pretty' -d '{"query": {"match_all": {}}}'
 		fi
 		;;
     *)

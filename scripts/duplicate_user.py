@@ -88,7 +88,8 @@ class BulkAdd:
         data = ''
         for line in f:
             data = data + line
-            print(line)
+            sys.stderr.write('.')
+        sys.stderr.write('\n')
         http = urllib3.PoolManager()
         # In examples the 'data' is JSON-ified with json.dumps() but our data is already JSON.
         r = http.request('POST', self.url, body=data, headers={'Content-Type': 'application/json'})
@@ -128,20 +129,22 @@ class BulkDelete:
         
 # Displays usage message for the script.
 def usage():
-    '''Prints usage message to STDOUT.'''
-    print('Usage: {0} [-lsx]'.format('duplicate_user.py'))
-    print(' -b (--bulk_add=) Bulk load JSON user data from EPLAPP in the following format: UKEY|FNAME|LNAME|EMAIL|DOB|')
-    print(' -d (--bulk_delete=) Bulk delete users from the database. User keys stored in a file; one-per-line.')
-    print(' -x This message.')
+    """Prints usage message to STDOUT."""
+    print('''\
+    Usage: {0} [-lsx]'.format('duplicate_user.py
+    -d (--bulk_delete=) Bulk delete users from the database. User keys stored in a file; one-per-line.'
+    -b (--bulk_add=) Bulk load JSON user data from EPLAPP in the following format: UKEY|FNAME|LNAME|EMAIL|DOB|'
+    -t Switch on test mode and write to the test database.
+    -x This message.''')
     sys.exit(1)
 
 # Take valid command line arguments -b, -d, and -x.
 def main(argv):
     customer_loader = ''
     customer_file = ''
-    database = 'duplicate_user_test'
+    database = 'duplicate_user'
     try:
-        opts, args = getopt.getopt(argv, "b:d:Ux", ['--bulk_add=', '--bulk_delete='])
+        opts, args = getopt.getopt(argv, "b:d:tx", ['--bulk_add=', '--bulk_delete='])
     except getopt.GetoptError:
         usage()
     for opt, arg in opts:
@@ -153,6 +156,8 @@ def main(argv):
             customer_file = arg
             customer_deleter = BulkDelete(customer_file, database, 'users_delete.txt')
             customer_deleter.run()
+        if opt in ( "-t" ):
+            database = 'duplicate_user_test'
         elif opt in "-x":
             usage()
     
