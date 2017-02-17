@@ -110,3 +110,39 @@ curl -XGET 'http://localhost:9200/epl/duplicate_user_test/1382905?pretty'
   "found" : false
 }
 ```
+Example of setting properties on new index
+------------------------------------------
+From http://stackoverflow.com/questions/21876857/elasticsearch-index-creation-with-mapping
+```
+{
+    "settings":{
+        "analysis":{
+            "analyzer":{
+                "analyzer1":{
+                    "type":"custom",
+                    "tokenizer":"standard",
+                    "filter":[ "standard", "lowercase", "stop", "kstem", "ngram" ]
+                }
+            },
+            "filter":{
+                "ngram":{
+                    "type":"ngram",
+                    "min_gram":2,
+                    "max_gram":15
+                }
+            }
+        }
+    },
+    "mappings": {
+        "product": {
+            "properties": {
+                "title": {
+                    "type": "string",
+                    "search_analyzer" : "analyzer1",
+                    "index_analyzer" : "analyzer1"
+                }
+            }
+        }
+    }
+}
+```
