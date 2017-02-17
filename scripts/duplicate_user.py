@@ -27,6 +27,7 @@
 import sys
 import getopt
 import urllib3
+import json
 
 # curl -i -XGET 'http://localhost:9200/_cluster/health?pretty'
 # HTTP/1.1 200 OK
@@ -61,11 +62,15 @@ class CustomerFileWriter:
         # Gets converted into this:
         # {"index":{"_id":"UKEY"}}
         # {"fname":"FNAME", "lname":"LNAME", "dob":"DOB", "email":"EMAIL" }
-        self.output_file.write("{\"index\":{\"_id\": \"%s\"}}\n{" % (my_data[0]))
-        self.output_file.write("\"fname\": \"%s\", " % (my_data[1]))
-        self.output_file.write("\"lname\": \"%s\", " % (my_data[2]))
-        self.output_file.write("\"email\": \"%s\", " % (my_data[3]))
-        self.output_file.write("\"dob\": \"%s\" }\n" % (my_data[4]))
+        index_line = {}
+        index_line['index'] = { '_id' : my_data[0] }
+        customer   = {}
+        customer['fname'] = my_data[1]
+        customer['lname'] = my_data[2]
+        customer['email'] = my_data[3]
+        customer['dob']   = my_data[4]
+        self.output_file.write(json.dumps(index_line) + '\n')
+        self.output_file.write(json.dumps(customer) + '\n')        
 
 # Adds users in bulk to the duplicate database.
 class BulkAdd:
@@ -138,11 +143,12 @@ def usage():
     -x This message.''')
     sys.exit(1)
 
-# Take valid command line arguments -b, -d, and -x.
+# Take valid command line arguments -b, -d, -t, and -x.
 def main(argv):
     customer_loader = ''
     customer_file = ''
     database = 'duplicate_user'
+    is_test = False
     try:
         opts, args = getopt.getopt(argv, "b:d:tx", ['--bulk_add=', '--bulk_delete='])
     except getopt.GetoptError:
@@ -158,6 +164,7 @@ def main(argv):
             customer_deleter.run()
         if opt in ( "-t" ):
             database = 'duplicate_user_test'
+            is_test = True
         elif opt in "-x":
             usage()
     
