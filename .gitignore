@@ -4,3 +4,4 @@ incoming/
 elasticsearch.pid
 *.json
 delete/
+scripts/zero.file
