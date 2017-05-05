@@ -39,8 +39,8 @@ scp $SERVER:$REMOTE_DIR/$USER_FILE $LOCAL_DIR/$USER_FILE
 if [ -s "$LOCAL_DIR/$USER_FILE" ]; then
 	/usr/bin/python $PY_SCRIPT_DIR $PY_SCRIPT_ARGS
 	# Zero out the remote file to ensure we don't reload the users.
-	touch zero.file
-	scp zero.file $SERVER:$REMOTE_DIR/$USER_FILE
+	touch $LOCAL_DIR/zero.file
+	scp $LOCAL_DIR/zero.file $SERVER:$REMOTE_DIR/$USER_FILE
 	exit 0
 else
 	printf "* warn: file '%s' didn't copy over from %s.\n" $USER_FILE $SERVER >&2

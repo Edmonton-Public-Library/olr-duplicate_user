@@ -5,3 +5,5 @@ elasticsearch.pid
 *.json
 delete/
 scripts/zero.file
+certs/
+*.log
