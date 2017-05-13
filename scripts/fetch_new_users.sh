@@ -34,13 +34,14 @@ USER_FILE=users.lst
 REMOTE_DIR=/s/sirsi/Unicorn/EPLwork/cronjobscripts/OnlineRegistration
 LOCAL_DIR=/home/ilsadmin/duplicate_user/incoming
 PY_SCRIPT_DIR=/home/ilsadmin/duplicate_user/scripts/duplicate_user.py
-PY_SCRIPT_ARGS="-b$LOCAL_DIR/$USER_FILE"
-scp $SERVER:$REMOTE_DIR/$USER_FILE $LOCAL_DIR/$USER_FILE
-if [ -s "$LOCAL_DIR/$USER_FILE" ]; then
+PY_SCRIPT_ARGS="-b$USER_FILE"
+cd $LOCAL_DIR
+scp $SERVER:$REMOTE_DIR/$USER_FILE $USER_FILE
+if [ -s "$USER_FILE" ]; then
 	/usr/bin/python $PY_SCRIPT_DIR $PY_SCRIPT_ARGS
 	# Zero out the remote file to ensure we don't reload the users.
-	touch $LOCAL_DIR/zero.file
-	scp $LOCAL_DIR/zero.file $SERVER:$REMOTE_DIR/$USER_FILE
+	touch zero.file
+	scp zero.file $SERVER:$REMOTE_DIR/$USER_FILE
 	exit 0
 else
 	printf "* warn: file '%s' didn't copy over from %s.\n" $USER_FILE $SERVER >&2
