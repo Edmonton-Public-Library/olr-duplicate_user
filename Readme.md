@@ -15,6 +15,22 @@ Directory Structure
 + delete/ - delete directory. By default duplicate_user.py looks for a users.lst here. the file should contain all the keys you wish to delete from the database, one-per-line (no trailing pipes '|'). Once created you can run ```make delete``` to delete these customers.
 + incoming/ - directory where all the customer data is to be loaded. The file is in the form of 'UKEY|FNAME|LNAME|EMAIL|DOB|' and can be readily made from Symphony API. Once SCP'ed over to this directory type ```make load``` in the project home directory and the script will load the customer data.
 
+cURL requests
+-------------
+The service connects on HTTPS so if you are testing internally, use '-k' on cURL to avoid certificate smozzle.
+To test the status:
+curl -XGET -k 'https://localhost:8124/status'
+{"status":"OK","details":{"service":"up","user_count":431373}}
+
+To test if a customer is a duplicate:
+curl -XGET -k 'https://epl-olr.epl.ca:8124/check_duplicate?lname=Balzac&fname=William&dob=1900-01-01&email=ilsadmins@epl.ca'
+{"status":"OK","details":{"duplicate":true}}
+
+'https://epl-olr.epl.ca:8124/check_duplicate?lname=Balzac&fname=William&dob=1900-01-01&email=ilsadminds@fpl.ca'
+{"status":"OK","details":{"duplicate":true}}
+
+'https://epl-olr.epl.ca:8124/check_duplicate?lname=Balzac&fname=William&dob=1900-01-02&email=ilsadmins@epl.ca'
+{"status":"OK","details":{"duplicate":false}}
 
 JSON-ifying
 -----------
