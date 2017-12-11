@@ -68,16 +68,15 @@ class CustomerFileWriter:
     def output(self, pipe_data):
         my_data = pipe_data.split('|')
         # UKEY|FNAME|LNAME|EMAIL|DOB|
-        # 1382679|LEVI|PETER|LPETER946@MYNORQUEST.CA|19940101|
         # Gets converted into this:
         # {"index":{"_id":"UKEY"}}
         # {"fname":"FNAME", "lname":"LNAME", "dob":"DOB", "email":"EMAIL" }
         index_line = {}
         index_line['index'] = { '_id' : my_data[0] }
         customer   = {}
-        customer['fname'] = my_data[1]
-        customer['lname'] = my_data[2]
-        customer['email'] = my_data[3]
+        customer['fname'] = my_data[1].lower()
+        customer['lname'] = my_data[2].lower()
+        customer['email'] = my_data[3].lower()
         customer['dob']   = self._fix_date(my_data[4])
         self.output_file.write(json.dumps(index_line) + '\n')
         self.output_file.write(json.dumps(customer) + '\n')        
@@ -107,11 +106,11 @@ class BulkAdd:
         # In examples the 'data' is JSON-ified with json.dumps() but our data is already JSON.
         r = http.request('POST', self.url, body=data, headers={'Content-Type': 'application/json'})
         sys.stderr.write('done.\n')
-        # Failed search: curl -i -XGET 'http://localhost:9200/epl/duplicate_user_test/_search?pretty' -d '{"query":{"match":{"lname":"Bill"}}}'
-        # Success search: curl -i -XGET 'http://localhost:9200/epl/duplicate_user_test/_search?pretty' -d '{"query":{"match":{"lname":"Sexsmith"}}}'
+        # Failed search: curl -i -XGET 'http://localhost:9200/epl/duplicate_user/_search?pretty' -d '{"query":{"match":{"lname":"Bill"}}}'
+        # Success search: curl -i -XGET 'http://localhost:9200/epl/duplicate_user/_search?pretty' -d '{"query":{"match":{"lname":"Sexsmith"}}}'
         ####
-        # Exact match success: curl -i -XGET 'http://localhost:9200/epl/duplicate_user_test/_search?q=%2Bfname%3ASusan+%2Blname%3ASexsmith'
-        # Exact match fail: curl -i -XGET 'http://localhost:9200/epl/duplicate_user_test/_search?q=%2Bfname%3ASusan+%2Blname%3ASixsmith'
+        # Exact match success: curl -i -XGET 'http://localhost:9200/epl/duplicate_user/_search?q=%2Bfname%3ASusan+%2Blname%3ASexsmith'
+        # Exact match fail: curl -i -XGET 'http://localhost:9200/epl/duplicate_user/_search?q=%2Bfname%3ASusan+%2Blname%3ASixsmith'
         ### The '+' means that the condition must be satisfied for the query to succeed. 
         # Page 77 Definitive Guide
         # {"took":3,"timed_out":false,"_shards":{"total":5,"successful":5,"failed":0},"hits":{"total":0,"max_score":null,"hits":[]}}
