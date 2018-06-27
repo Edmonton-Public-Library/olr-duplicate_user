@@ -138,13 +138,16 @@ class BulkDelete:
         except:
             sys.stderr.write('** error, while attempting to open "{0}"!\n'.format(self.user_keys_file))
             sys.exit(1)
+        count = 0
         for user_key in f:
             # Each line is a customer. 
             # UKEY|
             data = self.url + '/{0}?pretty'.format(user_key.strip())
-            print(data)
+            # print(data)
             r = http.request('DELETE', data, headers={'Content-Type': 'text/plain'})
-            print(str(r.data))
+            # print(str(r.data))
+            count = count + 1
+        sys.stderr.write("removed {0} records.\n".format(count))
 
 # Creates a new epl duplicate_users database with properties.
 def create_index(database):
@@ -205,10 +208,12 @@ def report_all_customers(customer_file, my_index='epl', my_database='duplicate_u
     except:
         sys.stderr.write('** error, while attempting to open "{0}"!\n'.format(customer_file))
         sys.exit(1)
+    count = 0
     for key in ids:
+        count = count + 1
         # UKEY
         file.write(key + '\n')
-    
+    sys.stderr.write("total user keys to remove: {0}\n".format(count))
 # Displays usage message for the script.
 def usage():
     """Prints usage message to STDOUT."""
