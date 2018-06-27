@@ -29,9 +29,9 @@
 ##############################################################################
 # Setup variables
 SERVICE="duplicate user elasticsearch instance."
-PORT=9200
-ELASTIC_BIN=`pwd`/elasticsearch-5.2.0/bin/elasticsearch
-PID_FILE=`pwd`/elasticsearch.pid
+# PORT=9200
+ELASTIC_BIN=/home/ilsadmin/duplicate_user/elasticsearch-5.2.0/bin/elasticsearch
+PID_FILE=/home/ilsadmin/duplicate_user/elasticsearch.pid
 do_exec()
 {
 	if [ ! -f "$ELASTIC_BIN" ]; then
