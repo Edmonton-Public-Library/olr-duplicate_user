@@ -29,6 +29,13 @@ import getopt
 import urllib3
 import json
 import re
+# For use of the elasticsearch module we will link the package here.
+# They got installed in /usr/local/lib/python2.7/dist-packages so we 
+# will have to add that path so we can find the packages we need for
+# professional elasticsearch python.
+sys.path.insert(0, "/usr/local/lib/python2.7/dist-packages")
+from elasticsearch import Elasticsearch
+from elasticsearch_dsl import Search
 
 # curl -i -XGET 'http://localhost:9200/_cluster/health?pretty'
 # HTTP/1.1 200 OK
@@ -179,12 +186,35 @@ def delete_index():
     sys.stderr.write('deleting index "{0}"\n'.format(data))
     r = http.request('DELETE', data, headers={'Content-Type': 'text/plain'})
     print(str(r.data))
-        
+
+# Creates a file full of all the user keys in the duplicate user database. 
+# This can be used during any re-sync process or the like. Once you have
+# a complete list of users in the elastic search database, you can clean update
+# the duplicate user database by comparing the user keys to those in the ILS.
+def report_all_customers(customer_file, my_index='epl', my_database='duplicate_user'):
+    """Outputs all the user keys to file."""
+    ## Code based on solution found at:
+    ## https://stackoverflow.com/questions/17497075/efficient-way-to-retrieve-all-ids-in-elasticsearch
+    es = Elasticsearch()
+    # epl/duplicate_user
+    s = Search(using=es, index=my_index, doc_type=my_database)
+    s = s.source([])  # only get ids, otherwise `fields` takes a list of field names
+    ids = [h.meta.id for h in s.scan()]
+    try:
+        file = open(customer_file, 'w')
+    except:
+        sys.stderr.write('** error, while attempting to open "{0}"!\n'.format(customer_file))
+        sys.exit(1)
+    for key in ids:
+        # UKEY
+        file.write(key + '\n')
+    
 # Displays usage message for the script.
 def usage():
     """Prints usage message to STDOUT."""
     print('''\
-    Usage: duplicate_user.py [-b<file>] [-d<delete_user_file>] [-txDC]
+    Usage: duplicate_user.py [-a<all_user_keys_file>] [-b<file>] [-d<delete_user_file>] [-txDC]
+    -a (--all_user_keys_file=) Output all the user keys in the duplicate user database to file.
     -b (--bulk_add=) Bulk load JSON user data from EPLAPP in the following format: UKEY|FNAME|LNAME|EMAIL|DOB|'
     -C Creates the elasticsearch index, then exits. (See -D for deleting the database).
     -d (--bulk_delete=) Bulk delete users from the database. User keys stored in a file; one-per-line.'
@@ -197,14 +227,18 @@ def usage():
 def main(argv):
     customer_loader = ''
     customer_file = ''
+    index = 'epl'
     database = 'duplicate_user'
     is_test = False
     try:
-        opts, args = getopt.getopt(argv, "b:Cd:Dtx", ['--bulk_add=', '--bulk_delete='])
+        opts, args = getopt.getopt(argv, "a:b:Cd:Dtx", ['--all_user_keys_file', '--bulk_add=', '--bulk_delete='])
     except getopt.GetoptError:
         usage()
     for opt, arg in opts:
-        if opt in ( "-b", "--bulk_add" ):
+        if opt in ( "-a", "--all_user_keys_file" ):
+            customer_file = arg
+            report_all_customers(customer_file, index, database)
+        elif opt in ( "-b", "--bulk_add" ):
             customer_file = arg
             customer_loader = BulkAdd(customer_file, database, 'users_add.json')
             customer_loader.run()
