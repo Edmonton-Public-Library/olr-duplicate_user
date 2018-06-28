@@ -34,12 +34,14 @@ DELETE_USERS_FILE=$LOCAL_DIR/users_delete.txt
 ALL_DUPLICATE_USER_KEYS_FILE=$LOCAL_DIR/all_duplicate_user_keys.txt
 ALL_ILS_USER_KEYS_FILE=$LOCAL_DIR/all_ILS_user_keys.txt
 PY_SCRIPT=/home/ilsadmin/duplicate_user/scripts/duplicate_user.py
+LOG=/home/ilsadmin/duplicate_user/logs/duplicateDB_resync.log
 ## We use fully qualified paths, but will go to that directory just in case I forgot one.
 cd $LOCAL_DIR
 ## Output all the user keys in the duplicate user database.
 printf "Creating a list of all existing user keys from the doctype 'duplicate_user' in index 'epl'...\n" >&2
 /usr/bin/python $PY_SCRIPT -a $ALL_DUPLICATE_USER_KEYS_FILE
 printf "done\n" >&2
+echo "["`date`"] Creating a list of all existing user keys from the doctype 'duplicate_user' in index 'epl' - COMPLETE." >>$LOG
 if [ -s "$ALL_DUPLICATE_USER_KEYS_FILE" ]; then
     # Should look like a file where each line is a user key.
     # 854063
@@ -50,6 +52,7 @@ if [ -s "$ALL_DUPLICATE_USER_KEYS_FILE" ]; then
     printf "Comparing all user keys with those in the ILS...\n" >&2
     cat $ALL_DUPLICATE_USER_KEYS_FILE | ssh $SERVER 'cat - | seluser -iU' 2>/dev/null >$ALL_ILS_USER_KEYS_FILE
     printf "done\n" >&2
+    echo "["`date`"] Comparing all user keys with those in the ILS - COMPLETE." >>$LOG
     if [ -s "$ALL_ILS_USER_KEYS_FILE" ]; then
         ## now you have to compare the 2 files. Normally I would use diff.pl, but on this job we can use pipe.pl
         ## cat $ALL_DUPLICATE_USER_KEYS_FILE | pipe.pl -0$ALL_ILS_USER_KEYS_FILE -Mc0:c0?c0 
@@ -60,6 +63,7 @@ if [ -s "$ALL_DUPLICATE_USER_KEYS_FILE" ]; then
         printf "Filtering user keys to determine which to remove...\n" >&2
         cat $ALL_DUPLICATE_USER_KEYS_FILE | pipe.pl -0$ALL_ILS_USER_KEYS_FILE -Mc0:c0?c0 | pipe.pl -Zc1 >$DELETE_USERS_FILE
         printf "done\n" >&2
+        echo "["`date`"] Filtering user keys to determine which to remove - COMPLETE." >>$LOG
         # 854055
         if [ -s "$DELETE_USERS_FILE" ]; then
             printf "Removing duplicate users from index 'epl', doc_type 'duplicate_user'.\n" >&2
@@ -67,15 +71,19 @@ if [ -s "$ALL_DUPLICATE_USER_KEYS_FILE" ]; then
             ## now remove the user file so it doesn't get reprocessed, not dangerours if it doesn't but takes time.
             # rm $DELETE_USERS_FILE
             printf "done\n" >&2
+            echo "["`date`"] Removal of invalid duplicate users from 'duplicate_user' database - COMPLETE." >>$LOG
         else
             printf "The duplicate user database is clean, no duplicate users were found.\n" >&2
+            echo "["`date`"] The duplicate user database is clean, no duplicate users were found." >>$LOG
         fi
     else # The $ALL_ILS_USER_KEYS_FILE  didn't get created (the ILS didn't respond or ssh keys didn't work or ...)
         printf "There was a problem contacting the ILS, or it didn't respond.\n" >&2
+        echo "["`date`"] There was a problem contacting the ILS, or it didn't respond." >>$LOG
         exit 1
     fi
 else # The $ALL_DUPLICATE_USER_KEYS_FILE file is empty so the database isn't running, the query failed, the database is empty.
     printf "$ALL_DUPLICATE_USER_KEYS_FILE file wasn't created. The database isn't running, is empty, or the query failed.\n" >&2
+    echo "["`date`"] $ALL_DUPLICATE_USER_KEYS_FILE file wasn't created. The database isn't running, is empty, or the query failed." >>$LOG
     exit 1
 fi
 exit 0
