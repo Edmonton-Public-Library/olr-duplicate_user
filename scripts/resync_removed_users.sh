@@ -39,7 +39,7 @@ LOG=/home/ilsadmin/duplicate_user/logs/duplicateDB_resync.log
 cd $LOCAL_DIR
 ## Output all the user keys in the duplicate user database.
 printf "Creating a list of all existing user keys from the doctype 'duplicate_user' in index 'epl'...\n" >&2
-/usr/bin/python $PY_SCRIPT -a $ALL_DUPLICATE_USER_KEYS_FILE
+/usr/bin/python $PY_SCRIPT -a $ALL_DUPLICATE_USER_KEYS_FILE 2>&1 >>$LOG
 printf "done\n" >&2
 echo "["`date`"] Creating a list of all existing user keys from the doctype 'duplicate_user' in index 'epl' - COMPLETE." >>$LOG
 if [ -s "$ALL_DUPLICATE_USER_KEYS_FILE" ]; then
@@ -67,7 +67,7 @@ if [ -s "$ALL_DUPLICATE_USER_KEYS_FILE" ]; then
         # 854055
         if [ -s "$DELETE_USERS_FILE" ]; then
             printf "Removing duplicate users from index 'epl', doc_type 'duplicate_user'.\n" >&2
-            /usr/bin/python $PY_SCRIPT -d $DELETE_USERS_FILE
+            /usr/bin/python $PY_SCRIPT -d $DELETE_USERS_FILE 2>&1 >>$LOG
             ## now remove the user file so it doesn't get reprocessed, not dangerours if it doesn't but takes time.
             # rm $DELETE_USERS_FILE
             printf "done\n" >&2
