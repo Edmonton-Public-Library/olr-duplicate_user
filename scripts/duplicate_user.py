@@ -213,7 +213,7 @@ def report_all_customers(customer_file, my_index='epl', my_database='duplicate_u
         count = count + 1
         # UKEY
         file.write(key + '\n')
-    sys.stderr.write("total user keys to remove: {0}\n".format(count))
+    sys.stderr.write("total user keys in index {0}, doc_type {1}: {2}\n".format(my_index, my_database, count))
 # Displays usage message for the script.
 def usage():
     """Prints usage message to STDOUT."""
