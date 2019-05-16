@@ -28,7 +28,7 @@
 ### This script creates a list of all user keys, then compares those that 
 ### exist in the ILS  
 # Setup variables
-SERVER=sirsi\@eplapp
+SERVER=sirsi\@eplapp.library.ualberta.ca
 LOCAL_DIR=/home/ilsadmin/duplicate_user/delete
 DELETE_USERS_FILE=$LOCAL_DIR/users_delete.txt
 ALL_DUPLICATE_USER_KEYS_FILE=$LOCAL_DIR/all_duplicate_user_keys.txt

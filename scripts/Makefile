@@ -40,15 +40,15 @@ delete: ${PY_APP}
 create: ${PY_APP}
 	python ${PY_APP} -C
 rebuild: ${PY_APP} 
-	# Wipe out the last.run file from production.
-	delete
-	# Create the new index.
-	create
 	# Take a new sample of all users in the ILS
 	## delete the last run file. The sample_app will grab all users.
 	touch ${LOCAL_LOAD_DIR}/zero.file
 	scp ${LOCAL_LOAD_DIR}/zero.file ${REMOTE_SERVER}:${REMOTE_DIR}/last.run
 	## Sample app will now gather data from all users.
 	ssh ${REMOTE_SERVER} '${REMOTE_DIR}/${SAMPLE_APP}'
+	# Wipe out the last.run file from production.
+	python ${PY_APP} -D
+	# Create the new index.
+	python ${PY_APP} -C
 	# Now run the local customer loader.
 	${LOCAL_LOADER}
