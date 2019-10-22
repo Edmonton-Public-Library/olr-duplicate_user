@@ -29,7 +29,7 @@ APP=scripts/duplicate_user.py
 
 check: ${SERVICE}
 	${SERVICE} check
-	
+
 start: ${SERVICE}
 	${SERVICE} start
 
@@ -38,9 +38,9 @@ stop: ${SERVICE}
 
 restart: ${SERVICE}
 	${SERVICE} restart
-	
+
 load:
 	python ${APP} -bincoming/users.lst
-	
+
 delete:
 	python ${APP} -ddelete/users.lst

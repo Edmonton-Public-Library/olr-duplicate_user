@@ -8,12 +8,12 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
@@ -21,20 +21,21 @@
 #
 # Author:  Andrew Nisbet, Edmonton Public Library
 # Copyright (c) Wed Jun 27 12:12:21 MDT 2018
-# Rev: 
-#          0.0 - Dev. 
+# Rev:
+#          0.0 - Dev.
 #
 ##############################################################################
-### This script creates a list of all user keys, then compares those that 
-### exist in the ILS  
+### This script creates a list of all user keys, then compares those that
+### exist in the ILS
 # Setup variables
-SERVER=sirsi\@eplapp.library.ualberta.ca
-LOCAL_DIR=/home/ilsadmin/duplicate_user/delete
+#SERVER=sirsi\@eplapp.library.ualberta.ca
+SERVER=sirsi\@edpt-t.library.ualberta.ca
+LOCAL_DIR=$HOME/OnlineRegistration/olr-duplicate_user/delete
 DELETE_USERS_FILE=$LOCAL_DIR/users_delete.txt
 ALL_DUPLICATE_USER_KEYS_FILE=$LOCAL_DIR/all_duplicate_user_keys.txt
 ALL_ILS_USER_KEYS_FILE=$LOCAL_DIR/all_ILS_user_keys.txt
-PY_SCRIPT=/home/ilsadmin/duplicate_user/scripts/duplicate_user.py
-LOG=/home/ilsadmin/duplicate_user/logs/duplicateDB_resync.log
+PY_SCRIPT=$HOME/OnlineRegistration/olr-duplicate_user/scripts/duplicate_user.py
+LOG=$HOME/OnlineRegistration/olr-duplicate_user/logs/duplicateDB_resync.log
 ## We use fully qualified paths, but will go to that directory just in case I forgot one.
 cd $LOCAL_DIR
 ## Output all the user keys in the duplicate user database.
@@ -55,7 +56,7 @@ if [ -s "$ALL_DUPLICATE_USER_KEYS_FILE" ]; then
     echo "["`date`"] Comparing all user keys with those in the ILS - COMPLETE." >>$LOG
     if [ -s "$ALL_ILS_USER_KEYS_FILE" ]; then
         ## now you have to compare the 2 files. Normally I would use diff.pl, but on this job we can use pipe.pl
-        ## cat $ALL_DUPLICATE_USER_KEYS_FILE | pipe.pl -0$ALL_ILS_USER_KEYS_FILE -Mc0:c0?c0 
+        ## cat $ALL_DUPLICATE_USER_KEYS_FILE | pipe.pl -0$ALL_ILS_USER_KEYS_FILE -Mc0:c0?c0
         # 854063|854063
         # 854055
         ## All the lines that have a c1 field are in the ILS AND in the duplicate user database; that's good.
