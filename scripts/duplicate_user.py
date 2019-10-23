@@ -30,7 +30,7 @@ import urllib3
 import json
 import re
 # For use of the elasticsearch module we will link the package here.
-# They got installed in /usr/local/lib/python2.7/dist-packages so we 
+# They got installed in /usr/local/lib/python2.7/dist-packages so we
 # will have to add that path so we can find the packages we need for
 # professional elasticsearch python.
 sys.path.insert(0, "/usr/local/lib/python2.7/dist-packages")
@@ -62,16 +62,16 @@ from elasticsearch_dsl import Search
 class CustomerFileWriter:
     def __init__(self, output_file_name='users.json'):
         self.output_file = open(output_file_name, 'w')
-    
+
     def _fix_date(self, date_string):
-        # If the customer doesn't have a birthdate need to add a dummy one. 
+        # If the customer doesn't have a birthdate need to add a dummy one.
         # Comes in like '0--'
         regex = r"\d{4}\-\d{2}\-\d{2}"
         if re.match(regex, date_string):
             return date_string
         else:
             return '1900-01-01'
-            
+
     def output(self, pipe_data):
         my_data = pipe_data.split('|')
         # UKEY|FNAME|LNAME|EMAIL|DOB|
@@ -86,7 +86,7 @@ class CustomerFileWriter:
         customer['email'] = my_data[3].lower()
         customer['dob']   = self._fix_date(my_data[4])
         self.output_file.write(json.dumps(index_line) + '\n')
-        self.output_file.write(json.dumps(customer) + '\n')        
+        self.output_file.write(json.dumps(customer) + '\n')
 
 # Adds users in bulk to the duplicate database.
 class BulkAdd:
@@ -101,9 +101,9 @@ class BulkAdd:
             sys.exit(1)
         customerFileWriter = CustomerFileWriter(self.output_file)
         for line in self.file:
-            # Each line is a customer. 
+            # Each line is a customer.
             # UKEY|FNAME|LNAME|EMAIL|DOB|
-            customerFileWriter.output(line)  
+            customerFileWriter.output(line)
     def run(self):
         f = open(self.output_file, 'r')
         data = ''
@@ -118,11 +118,11 @@ class BulkAdd:
         ####
         # Exact match success: curl -i -XGET 'http://localhost:9200/epl/duplicate_user/_search?q=%2Bfname%3ASusan+%2Blname%3ASexsmith'
         # Exact match fail: curl -i -XGET 'http://localhost:9200/epl/duplicate_user/_search?q=%2Bfname%3ASusan+%2Blname%3ASixsmith'
-        ### The '+' means that the condition must be satisfied for the query to succeed. 
+        ### The '+' means that the condition must be satisfied for the query to succeed.
         # Page 77 Definitive Guide
         # {"took":3,"timed_out":false,"_shards":{"total":5,"successful":5,"failed":0},"hits":{"total":0,"max_score":null,"hits":[]}}
 # Deletes many users from the database based on their user key.
-# This class expects the user key to be a single integer value, one-per-line, with no 
+# This class expects the user key to be a single integer value, one-per-line, with no
 # trailing pipe '|' characters.
 class BulkDelete:
     def __init__(self, input_file, database, output_file='users.json'):
@@ -130,7 +130,7 @@ class BulkDelete:
         self.output_file = output_file
         self.url = 'http://localhost:9200/epl/{0}'.format(database)
         self.user_keys_file = input_file
-        
+
     def run(self):
         http = urllib3.PoolManager()
         try:
@@ -140,7 +140,7 @@ class BulkDelete:
             sys.exit(1)
         count = 0
         for user_key in f:
-            # Each line is a customer. 
+            # Each line is a customer.
             # UKEY|
             data = self.url + '/{0}?pretty'.format(user_key.strip())
             # print(data)
@@ -158,7 +158,7 @@ def create_index(database):
     props['settings']['index']['analysis'] = {}
     props['settings']['index']['analysis']['analyzer'] = {}
     props['settings']['index']['analysis']['analyzer']['analyzer_keyword'] = {'tokenizer':'keyword', 'filter':'lowercase'}
-    
+
     # Mappings
     props['mappings'] = {}
     props['mappings'][database] = {}
@@ -181,7 +181,7 @@ def create_index(database):
     sys.stderr.write('creating index "{0}"\n'.format(data))
     r = http.request('PUT', data, body=json_data, headers={'Content-Type': 'application/json'})
     print(str(r.data))
-    
+
 # Deletes the epl index.
 def delete_index():
     http = urllib3.PoolManager()
@@ -190,7 +190,7 @@ def delete_index():
     r = http.request('DELETE', data, headers={'Content-Type': 'text/plain'})
     print(str(r.data))
 
-# Creates a file full of all the user keys in the duplicate user database. 
+# Creates a file full of all the user keys in the duplicate user database.
 # This can be used during any re-sync process or the like. Once you have
 # a complete list of users in the elastic search database, you can clean update
 # the duplicate user database by comparing the user keys to those in the ILS.
@@ -262,7 +262,7 @@ def main(argv):
             is_test = True
         elif opt in "-x":
             usage()
-    
+
     # Done.
     sys.exit(0)
 

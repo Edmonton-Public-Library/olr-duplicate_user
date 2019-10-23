@@ -28,8 +28,8 @@
 ### This script creates a list of all user keys, then compares those that
 ### exist in the ILS
 # Setup variables
-#SERVER=sirsi\@eplapp.library.ualberta.ca
-SERVER=sirsi\@edpt-t.library.ualberta.ca
+#SERVER=sirsi@eplapp.library.ualberta.ca
+SERVER=sirsi@edpl-t.library.ualberta.ca
 LOCAL_DIR=$HOME/OnlineRegistration/olr-duplicate_user/delete
 DELETE_USERS_FILE=$LOCAL_DIR/users_delete.txt
 ALL_DUPLICATE_USER_KEYS_FILE=$LOCAL_DIR/all_duplicate_user_keys.txt
@@ -51,7 +51,7 @@ if [ -s "$ALL_DUPLICATE_USER_KEYS_FILE" ]; then
     # 854063|
     ## If the file of all keys was produced, ask the ILS which are valid users.
     printf "Comparing all user keys with those in the ILS...\n" >&2
-    cat $ALL_DUPLICATE_USER_KEYS_FILE | ssh $SERVER 'cat - | seluser -iU' 2>/dev/null >$ALL_ILS_USER_KEYS_FILE
+    cat $ALL_DUPLICATE_USER_KEYS_FILE | ssh $SERVER 'cat - | /s/sirsi/Unicorn/Bin/seluser -iU' 2>/dev/null >$ALL_ILS_USER_KEYS_FILE
     printf "done\n" >&2
     echo "["`date`"] Comparing all user keys with those in the ILS - COMPLETE." >>$LOG
     if [ -s "$ALL_ILS_USER_KEYS_FILE" ]; then

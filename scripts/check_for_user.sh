@@ -75,7 +75,7 @@ esac
 ####
 # Exact match success: curl -i -XGET 'http://localhost:9200/epl/duplicate_user/_search?q=%2Bfname%3ASusan+%2Blname%3ASexsmith'
 # Exact match fail: curl -i -XGET 'http://localhost:9200/epl/duplicate_user/_search?q=%2Bfname%3ASusan+%2Blname%3ASixsmith'
-### The '+' means that the condition must be satisfied for the query to succeed. 
+### The '+' means that the condition must be satisfied for the query to succeed.
 # Page 77 Definitive Guide
 # {"took":3,"timed_out":false,"_shards":{"total":5,"successful":5,"failed":0},"hits":{"total":0,"max_score":null,"hits":[]}}
 done
@@ -110,4 +110,3 @@ fi
 # echo "\$SEARCH_STRING='$SEARCH_STRING'"
 # curl -i -XGET "http://localhost:9200/epl/duplicate_user/_search?q=${SEARCH_STRING}"
 # EOF
-
