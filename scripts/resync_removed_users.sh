@@ -28,8 +28,13 @@
 ### This script creates a list of all user keys, then compares those that
 ### exist in the ILS
 # Setup variables
-#SERVER=sirsi@eplapp.library.ualberta.ca
-SERVER=sirsi@edpl-t.library.ualberta.ca
+[[ -z "${DEPLOY_ENV}" ]] && DEPLOY_ENV='dev'
+if [[ "$DEPLOY_ENV" == "prod" ]]; then
+  SERVER=sirsi@eplapp.library.ualberta.ca
+else
+  SERVER=sirsi@edpl-t.library.ualberta.ca
+fi
+echo "Connecting to $SERVER"
 LOCAL_DIR=$HOME/OnlineRegistration/olr-duplicate_user/delete
 DELETE_USERS_FILE=$LOCAL_DIR/users_delete.txt
 ALL_DUPLICATE_USER_KEYS_FILE=$LOCAL_DIR/all_duplicate_user_keys.txt

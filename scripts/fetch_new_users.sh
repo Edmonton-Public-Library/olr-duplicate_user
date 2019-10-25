@@ -29,8 +29,13 @@
 ##############################################################################
 ### This script copies the new users' data from the ILS. The
 # Setup variables
-#SERVER=sirsi@eplapp.library.ualberta.ca
-SERVER=sirsi@edpl-t.library.ualberta.ca
+[[ -z "${DEPLOY_ENV}" ]] && DEPLOY_ENV='dev'
+if [[ "$DEPLOY_ENV" == "prod" ]]; then
+  SERVER=sirsi@eplapp.library.ualberta.ca
+else
+  SERVER=sirsi@edpl-t.library.ualberta.ca
+fi
+echo "Connecting to $SERVER"
 USER_FILE=users.lst
 REMOTE_DIR=/s/sirsi/Unicorn/EPLwork/cronjobscripts/OnlineRegistration
 LOCAL_DIR=$HOME/OnlineRegistration/olr-duplicate_user/incoming
