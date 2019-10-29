@@ -83,8 +83,8 @@ class CustomerFileWriter:
         customer   = {}
         customer['fname'] = my_data[1].lower()
         customer['lname'] = my_data[2].lower()
-        customer['email'] = my_data[3].lower()
-        customer['dob']   = self._fix_date(my_data[4])
+        customer['dob']   = self._fix_date(my_data[3])
+        customer['email'] = my_data[4].lower()
         self.output_file.write(json.dumps(index_line) + '\n')
         self.output_file.write(json.dumps(customer) + '\n')
 
