@@ -66,11 +66,14 @@ class CustomerFileWriter:
     def _fix_date(self, date_string):
         # If the customer doesn't have a birthdate need to add a dummy one.
         # Comes in like '0--'
-        regex = r"\d{4}\-\d{2}\-\d{2}"
-        if re.match(regex, date_string):
+        if re.match(r"\d{4}\-\d{2}\-\d{2}", date_string):
             return date_string
         else:
-            return '1900-01-01'
+            matches = re.match(r"(\d{4})(\d{2})(\d{2})", date_string)
+            if matches:
+                return "-".join(matches.groups())
+            else:
+                return '1900-01-01'
 
     def output(self, pipe_data):
         my_data = pipe_data.split('|')
