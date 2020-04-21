@@ -2,7 +2,7 @@
 ##################################################################################
 #
 # Removes users from the duplicate user database if they no longer appear in the ILS.
-#    Copyright (C) 2017  Andrew Nisbet
+#    Copyright (C) 2020  Andrew Nisbet
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,7 +22,9 @@
 # Author:  Andrew Nisbet, Edmonton Public Library
 # Copyright (c) Wed Jun 27 12:12:21 MDT 2018
 # Rev:
-#          0.0 - Dev.
+#          1.1 - Updated to omit specific profiles from ILS user selection.
+#          1.0 - Initial release.
+#          0.1 - Dev.
 #
 ##############################################################################
 ### This script creates a list of all user keys, then compares those that
@@ -41,6 +43,9 @@ ALL_DUPLICATE_USER_KEYS_FILE=$LOCAL_DIR/all_duplicate_user_keys.txt
 ALL_ILS_USER_KEYS_FILE=$LOCAL_DIR/all_ILS_user_keys.txt
 PY_SCRIPT=$HOME/OnlineRegistration/olr-duplicate_user/scripts/duplicate_user.py
 LOG=$HOME/OnlineRegistration/olr-duplicate_user/logs/duplicateDB_resync.log
+## Don't seluser these profiles, these customers CAN have an L-Pass and a EPL card if they 
+## live in the city's tax catchment area.
+IGNORE_PROFILES="EPL_UAL,EPL_GMU,EPL_CONCOR,EPL_NORQ,EPL_KINGS"
 ## We use fully qualified paths, but will go to that directory just in case I forgot one.
 cd $LOCAL_DIR
 ## Output all the user keys in the duplicate user database.
@@ -56,7 +61,13 @@ if [ -s "$ALL_DUPLICATE_USER_KEYS_FILE" ]; then
     # 854063|
     ## If the file of all keys was produced, ask the ILS which are valid users.
     printf "Comparing all user keys with those in the ILS...\n" >&2
-    cat $ALL_DUPLICATE_USER_KEYS_FILE | ssh $SERVER 'cat - | /s/sirsi/Unicorn/Bin/seluser -iU' 2>/dev/null >$ALL_ILS_USER_KEYS_FILE
+    #### V1.1
+    # We collect all the users on the ILS. We omit L-Pass customers because just being a UofA student doesn't stop
+    # you from having an EPL card as well. The problem is if they have an L-Pass account, they will fail the 
+    # duplicate user check. This became a problem during the COVID-19 crisis, April 21, 2020.
+    # Omitting these customers from the selection says we don't have these customers in the ILS (though we really might)
+    # so check through the list of user keys from the dupblicate user database and remove keys that aren't on the list from the ILS.
+    cat $ALL_DUPLICATE_USER_KEYS_FILE | ssh $SERVER 'cat - | /s/sirsi/Unicorn/Bin/seluser -p"~$IGNORE_PROFILES" -iU' 2>/dev/null >$ALL_ILS_USER_KEYS_FILE
     printf "done\n" >&2
     echo "["`date`"] Comparing all user keys with those in the ILS - COMPLETE." >>$LOG
     if [ -s "$ALL_ILS_USER_KEYS_FILE" ]; then
