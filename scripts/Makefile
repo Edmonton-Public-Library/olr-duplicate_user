@@ -27,12 +27,13 @@
 #REMOTE_SERVER=sirsi@eplapp.library.ualberta.ca
 REMOTE_SERVER=sirsi@edpl-t.library.ualberta.ca
 REMOTE_DIR=/s/sirsi/Unicorn/EPLwork/cronjobscripts/OnlineRegistration
+HOME=/home/ilsadmin
 SAMPLE_LAST_RUN=${REMOTE_SERVER}:${REMOTE_DIR}/last.run
 SAMPLE_APP=sample_users.sh
-LOCAL_DIR=$HOME/OnlineRegistration/olr-duplicate_user/scripts
+LOCAL_DIR=${HOME}/OnlineRegistration/olr-duplicate_user/scripts
 PY_APP=${LOCAL_DIR}/duplicate_user.py
 LOCAL_LOADER=${LOCAL_DIR}/fetch_new_users.sh
-LOCAL_LOAD_DIR=$HOME/OnlineRegistration/olr-duplicate_user/incoming
+LOCAL_LOAD_DIR=${HOME}/OnlineRegistration/olr-duplicate_user/incoming
 .PHONY: delete create test
 test:
 	curl -i -XGET 'http://localhost:9200/epl/duplicate_user/_search?q=+%2Blname%3Afontaine+%2Bfname%3Anicole+%2Bdob%3A1984-02-17+%2Bemail%3Avolkswagon_12yahooca'
