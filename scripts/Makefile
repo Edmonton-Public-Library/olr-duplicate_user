@@ -24,8 +24,8 @@
 #
 ###########################################################################
 
-#REMOTE_SERVER=sirsi@eplapp.library.ualberta.ca
-REMOTE_SERVER=sirsi@edpl-t.library.ualberta.ca
+REMOTE_SERVER=sirsi@eplapp.library.ualberta.ca
+# REMOTE_SERVER=sirsi@edpl-t.library.ualberta.ca
 REMOTE_DIR=/s/sirsi/Unicorn/EPLwork/cronjobscripts/OnlineRegistration
 HOME=/home/ilsadmin
 SAMPLE_LAST_RUN=${REMOTE_SERVER}:${REMOTE_DIR}/last.run
