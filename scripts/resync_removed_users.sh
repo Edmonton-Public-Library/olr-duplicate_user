@@ -32,7 +32,7 @@
 # Setup variables
 [[ -z "${DEPLOY_ENV}" ]] && DEPLOY_ENV='dev'
 if [[ "$DEPLOY_ENV" == "prod" ]]; then
-  SERVER=sirsi@eplapp.library.ualberta.ca
+  SERVER=sirsi@edpl.sirsidynix.net
 else
   SERVER=sirsi@edpl-t.library.ualberta.ca
 fi
@@ -67,7 +67,7 @@ if [ -s "$ALL_DUPLICATE_USER_KEYS_FILE" ]; then
     # duplicate user check. This became a problem during the COVID-19 crisis, April 21, 2020.
     # Omitting these customers from the selection says we don't have these customers in the ILS (though we really might)
     # so check through the list of user keys from the dupblicate user database and remove keys that aren't on the list from the ILS.
-    cat $ALL_DUPLICATE_USER_KEYS_FILE | ssh $SERVER "cat - | /s/sirsi/Unicorn/Bin/seluser -p~$IGNORE_PROFILES -iU" 2>/dev/null >$ALL_ILS_USER_KEYS_FILE
+    cat $ALL_DUPLICATE_USER_KEYS_FILE | ssh $SERVER "cat - | /software/EDPL/Unicorn/Bin/seluser -p~$IGNORE_PROFILES -iU" 2>/dev/null >$ALL_ILS_USER_KEYS_FILE
     printf "done\n" >&2
     echo "["`date`"] Comparing all user keys with those in the ILS - COMPLETE." >>$LOG
     if [ -s "$ALL_ILS_USER_KEYS_FILE" ]; then
