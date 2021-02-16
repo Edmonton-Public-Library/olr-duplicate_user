@@ -31,13 +31,13 @@
 # Setup variables
 [[ -z "${DEPLOY_ENV}" ]] && DEPLOY_ENV='dev'
 if [[ "$DEPLOY_ENV" == "prod" ]]; then
-  SERVER=sirsi@eplapp.library.ualberta.ca
+  SERVER=sirsi@edpl.sirsidynix.net
 else
   SERVER=sirsi@edpl-t.library.ualberta.ca
 fi
 echo "Connecting to $SERVER"
 USER_FILE=users.lst
-REMOTE_DIR=/s/sirsi/Unicorn/EPLwork/cronjobscripts/OnlineRegistration
+REMOTE_DIR=/software/EDPL/Unicorn/EPLwork/cronjobscripts/OnlineRegistration
 LOCAL_DIR=$HOME/OnlineRegistration/olr-duplicate_user/incoming
 PY_SCRIPT_DIR=$HOME/OnlineRegistration/olr-duplicate_user/scripts/duplicate_user.py
 PY_SCRIPT_ARGS="-b$USER_FILE"
