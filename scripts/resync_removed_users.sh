@@ -34,7 +34,7 @@
 if [[ "$DEPLOY_ENV" == "prod" ]]; then
   SERVER=sirsi@edpl.sirsidynix.net
 else
-  SERVER=sirsi@edpl-t.library.ualberta.ca
+  SERVER=sirsi@edpltest.sirsidynix.net
 fi
 echo "Connecting to $SERVER"
 LOCAL_DIR=$HOME/OnlineRegistration/olr-duplicate_user/delete
