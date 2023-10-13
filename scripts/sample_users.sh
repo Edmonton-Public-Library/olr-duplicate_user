@@ -19,7 +19,8 @@
 # MA 02110-1301, USA.
 #
 # Author:  Andrew Nisbet, Edmonton Public Library
-# Copyright (c) Friday, February  3, 2017  5:17:54 PM MST
+# Copyright (c) 2017-2023
+# Rev: 1.2 Added new profiles.
 # Rev: 1.1 Removed L-Pass profiles from the wanted list so they end
 #          up on the undesireable list, and will not end up in the 
 #          duplicate user database. If they don't show up there
@@ -35,7 +36,7 @@
 # without assuming any environment settings and we need to use sirsi's.
 ###############################################
 # *** Edit these to suit your environment *** #
-source /software/EDPL/Unicorn/EPLwork/cronjobscripts/setscriptenvironment.sh
+. /software/EDPL/Unicorn/EPLwork/cronjobscripts/setscriptenvironment.sh
 ###############################################
 SU_HOME=/software/EDPL/Unicorn/EPLwork/cronjobscripts/OnlineRegistration
 # This script features the ability to collect new users since the last time it ran.
@@ -45,7 +46,7 @@ DATE_FILE=$SU_HOME/last.run
 # user profiles we want - to start off with - then not them against all profiles,
 # We end up with an ever increasing list of profiles we don't want, but by negating
 # that selection we end up with new desireable profiles as well.
-DESIREABLE_PROFILES="EPL_ADULT,EPL_JUV,EPL_ADU01,EPL_ADU05,EPL_ADU10,EPL_ADU1FR,EPL_ACCESS,EPL_CORP,EPL_HOME,EPL_JONLIN,EPL_JUV01,EPL_JUV10,EPL_JUV05,EPL_JUVIND,EPL_JUV,EPL_JUVGR,EPL_ONLIN,EPL_THREE,EPL_TRESID,EPL_VISITR"
+DESIREABLE_PROFILES="EPL_NOVIDG,EPL_JNOVG,EPL_ADULT,EPL_JUV,EPL_ADU01,EPL_ADU05,EPL_ADU10,EPL_ADU1FR,EPL_ACCESS,EPL_CORP,EPL_HOME,EPL_JONLIN,EPL_JUV01,EPL_JUV10,EPL_JUV05,EPL_JUVIND,EPL_JUV,EPL_JUVGR,EPL_ONLIN,EPL_THREE,EPL_TRESID,EPL_VISITR"
 echo "$DESIREABLE_PROFILES" | pipe.pl -W',' -K >$SU_HOME/good.profiles
 getpol -tUPRF | pipe.pl -oc2 >$SU_HOME/all.profiles
 UNDESIREABLE_PROFILES=$(echo "$SU_HOME/all.profiles not $SU_HOME/good.profiles" | diff.pl -ec0 -fc0 | pipe.pl -h',' -H -P -j)
